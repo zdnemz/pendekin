@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getUrlByShortId } from "@/services/url.service"; // service untuk ambil original_url dari DB
+import { getUrlByShortId } from "@/services/url.service";
 
 interface PageProps {
   params: Promise<{
@@ -10,11 +10,13 @@ interface PageProps {
 export default async function ShortRedirectPage({ params }: PageProps) {
   const { short_url } = await params;
 
-  const { original_url } = await getUrlByShortId(short_url);
+  const data = await getUrlByShortId(short_url);
 
-  if (!original_url) {
+  if (!data?.original_url) {
     redirect("/404");
   }
+
+  const { original_url } = data;
 
   redirect(original_url);
 }
