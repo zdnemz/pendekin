@@ -5,10 +5,13 @@ export function response<T = unknown>(
   statusCode: number,
   payload: T
 ) {
-  return NextResponse.json({
-    success,
-    status: statusCode,
-    data: success ? payload : null,
-    error: success ? null : payload,
-  });
+  return NextResponse.json(
+    {
+      success,
+      status: statusCode,
+      data: success ? payload : null,
+      error: success ? null : payload,
+    },
+    { status: statusCode }
+  );
 }

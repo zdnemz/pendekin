@@ -1,6 +1,5 @@
 import { response } from "@/lib/response";
 import { createAnalytic } from "@/services/analytic.service";
-import { getCountry } from "@/services/geo.service";
 import { getUrlByShortId, incrementClick } from "@/services/url.service";
 
 export async function GET(
@@ -22,14 +21,11 @@ export async function GET(
       req.headers.get("cf-connecting-ip") ||
       "0.0.0.0";
 
-    const country = await getCountry(ip_address);
-
     await createAnalytic({
       url_id: url.id,
       ip_address,
       referrer,
       user_agent,
-      country,
     });
 
     await incrementClick(url.id);

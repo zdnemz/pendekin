@@ -5,17 +5,42 @@ import RootLayout from "@/components/layouts/RootLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { ApiResponse } from "@/types/response";
 
 export default function Home() {
   const [url, setUrl] = React.useState<string>("");
+  const [shortUrl, setShortUrl] = React.useState<string>("");
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!url.trim()) return toast("Please enter a valid URL");
-    console.log("Shortening URL:", url);
-    // TODO: Add API call for URL shortening
+
     setUrl(""); // reset after submit
+
+    try {
+      const res = await fetch("/api/urls/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          original_url: url,
+        }),
+      });
+
+      const json: ApiResponse<{ short_url: string }> = await res.json();
+
+      if (!json.success) {
+        throw new Error(json.error!);
+      }
+
+      setShortUrl(json.data!.short_url);
+
+      toast("Your url has been shorten");
+    } catch (err) {
+      toast((err as Error).message);
+    }
   };
 
   return (
@@ -49,6 +74,16 @@ export default function Home() {
             </Button>
           </form>
         </div>
+        {shortUrl && (
+          <div>
+            <p className="text-muted-foreground">
+              Your Shorten Link :{" "}
+              <span className="px-2 bg-accent text-accent-foreground">
+                {shortUrl}
+              </span>
+            </p>
+          </div>
+        )}
       </section>
     </RootLayout>
   );
